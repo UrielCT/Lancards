@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import java.util.Date
+import java.util.Locale
 
 enum class Estado {
  STOPPED, RUNNING, FINISHED
@@ -29,7 +30,6 @@ fun GameScreen(navigateBack:() -> Unit) {
     var estado by remember { mutableStateOf(Estado.STOPPED) }
     var correctas by remember { mutableStateOf(0) }
     var orden by remember { mutableStateOf("Mas Nuevas") }
-    //var seccion by remember { mutableStateOf("Todas") }
     var juego by remember { mutableStateOf("Recordar traducción") }
     var palabra by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
@@ -47,9 +47,10 @@ fun GameScreen(navigateBack:() -> Unit) {
     var isCorrect by remember { mutableStateOf<Boolean?>(null) }
     var textColor by remember { mutableStateOf<Color>(Color.Black) }
 
+
     var index by remember { mutableStateOf(0) }
     var cantidadCorrectas by remember { mutableStateOf(0) }
-
+    var palabrasFinales = listOf<Word>()
 
     // trae lista de palabras
     val palabras = listOf(
@@ -61,15 +62,12 @@ fun GameScreen(navigateBack:() -> Unit) {
     )
 
 
-
-
     val originList = listOf("Todos") + palabras.map { it.idiomaOrigen }.distinct()
     val tradList = listOf("Todos") + palabras.map { it.idiomaTrad }.distinct()
     val claseList = listOf("Todas") + palabras.map { it.clase }.distinct()
 
 
     val ordenList = listOf("Mas Nuevas","Mas Antiguas","Fecha Random", "Alfabético", "Alfabético Inverso", )
-
     val juegoList = listOf("Recordar traducción", "Recordar palabra")
 
 
@@ -185,8 +183,8 @@ fun GameScreen(navigateBack:() -> Unit) {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Palabras filtradas: " +
-                                        filteredWords.joinToString { it.palabra },
+                                text = "Palabras: " +
+                                        filteredWords.size,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = Color.Black
@@ -195,6 +193,7 @@ fun GameScreen(navigateBack:() -> Unit) {
 
                             Button(
                                     onClick = {
+                                        palabrasFinales = filteredWords
                                         filteredWords = filteredWords.take(cantidad.toInt())
                                         estado = Estado.RUNNING
                                               },
@@ -208,7 +207,6 @@ fun GameScreen(navigateBack:() -> Unit) {
 
                     Estado.RUNNING -> {
 
-                        // hacer condicional segun el Juego
                         // acumular las correctas
                         // poner boton para mostrar una pista
 
@@ -222,16 +220,29 @@ fun GameScreen(navigateBack:() -> Unit) {
 
 
                         Text(
-                            text= getText(index, filteredWords.size, filteredWords[index].palabra),
+                            text = getText(juego, index, filteredWords.size, filteredWords[index].palabra, filteredWords[index].traduccion),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            color =  textColor
+                            color = textColor
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = getCorrectText(juego, isCorrect, filteredWords[index].palabra, filteredWords[index].traduccion),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Green
                         )
                         Spacer(modifier = Modifier.height(16.dp))
+                        //si juego es 1- poner palabra,si es 2- poner traduccion
                         OutlinedTextField(
-                            value = traduccion,
-                            onValueChange = { traduccion = it },
-                            label = { Text("Traduce aquí") })
+                            value = if (juego == "Recordar traducción") traduccion else palabra,
+                            onValueChange = {
+                                val sanitizedText = it.replace("\n", "").replace("\r", "") // Elimina saltos de línea
+                                if (juego == "Recordar traducción") traduccion = sanitizedText else palabra = sanitizedText
+                            },
+                            label = { Text("Ingresá la forma correcta") }
+                        )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -240,13 +251,30 @@ fun GameScreen(navigateBack:() -> Unit) {
                         ) {
                             Button(
                                 onClick = {
-                                    if(traduccion == filteredWords[index].traduccion){
-                                        correctas++
-                                        textColor = Color.Green
-                                    }else {
-                                        // Agregar a una lista de palabras para practicar
-                                        textColor = Color.Red
+                                    if(juego == "Recordar traducción"){
+                                        if(traduccion.replace(" ", "").uppercase() == filteredWords[index].traduccion.replace(" ", "").uppercase()){
+                                            correctas++
+                                            isCorrect = true
+                                            textColor = Color.Green
+                                        }else {
+                                            // Agregar a una lista de palabras para practicar
+                                            isCorrect = false
+                                            textColor = Color.Red
+                                        }
+                                    }else if(juego == "Recordar palabra"){
+                                        if(palabra.replace(" ", "").uppercase() == filteredWords[index].palabra.replace(" ", "").uppercase()){
+                                            correctas++
+                                            isCorrect = true
+                                            textColor = Color.Green
+                                        }else {
+                                            isCorrect = false
+                                            // Agregar a una lista de palabras para practicar
+                                            textColor = Color.Red
+                                        }
                                     }
+                                    // poner if para compara los textos segun el juego
+                                    // poner los dos textos en mayuscula para comparar
+
                                     isCheckEnabled = false
                                     isNextEnabled = true
                                 },
@@ -259,6 +287,8 @@ fun GameScreen(navigateBack:() -> Unit) {
                             Button(
                                 onClick = {
                                     traduccion = ""
+                                    palabra = ""
+                                    isCorrect = null
                                     if (index < filteredWords.size - 1) {
                                         textColor = Color.Black
                                         index++
@@ -281,15 +311,28 @@ fun GameScreen(navigateBack:() -> Unit) {
                     }
 
                     Estado.FINISHED -> {
-                        Text("Correctas: $correctas")
-                        Text("Orden: $orden")
-                        //Text("Sección: $seccion")
-                        Text("Juego: $juego")
 
-                        Text("Correctas: $correctas",
+
+                        Text(
+                            text = "Correctas: $correctas de ${filteredWords.size}",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "Orden: $orden",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "Juego: $juego",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(16.dp))
+
                         Button(onClick = {
+                            filteredWords = palabrasFinales
                             correctas = 0
                             estado = Estado.STOPPED
                         }) {
@@ -305,18 +348,25 @@ fun GameScreen(navigateBack:() -> Unit) {
     )
 }
 
-fun getText(index: Int, size: Int, palabra: String):String {
-    return if (index < size) palabra else "Fin"
+fun getText(juego: String, index: Int, size: Int, palabra: String, traduccion: String): String {
+    return if (index < size) {
+        if (juego == "Recordar traducción") palabra else traduccion
+    } else {
+        "Fin"
+    }
 }
 
-fun setColor(isCorrect: Boolean?): Color {
-   return when (isCorrect) {
-       true -> Color.Green
-       false -> Color.Red
-       null -> Color.Black
 
+fun getCorrectText(juego: String, isCorrect: Boolean?, palabra: String, traduccion: String): String {
+   return if (juego == "Recordar traducción"){
+       if(isCorrect == false) traduccion else ""
+   } else {
+       if(isCorrect == false) palabra else ""
    }
 }
+
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
