@@ -7,23 +7,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.NightsStay
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.School
+import com.example.idioms.addwords.ui.WordsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    wordsViewModel: WordsViewModel,
     navigateToTutorial: () -> Unit,
     navigateToGame: () -> Unit,
     navigateToEditWord: () -> Unit,
@@ -57,6 +56,11 @@ fun HomeScreen(
                     }
                 }
             )
+            Button(
+                onClick = { navigateToAddWord() },
+            ) {
+                Text(text = "Add Word")
+            }
         },
         bottomBar = {
             BottomAppBar {
@@ -102,6 +106,7 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+
             items(words) { word ->
                 WordCard(navigateToEditWord, word)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -124,7 +129,7 @@ fun WordCard(navigateToEditWord: () -> Unit, word: WordItem) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = {navigateToEditWord()}) {
+                IconButton(onClick = { navigateToEditWord() }) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "Editar")
                 }
                 IconButton(onClick = {}) {

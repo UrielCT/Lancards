@@ -9,10 +9,13 @@ import com.example.idioms.GameScreen
 import com.example.idioms.HomeScreen
 import com.example.idioms.SignInScreen
 import com.example.idioms.TutorialScreen
+import com.example.idioms.addwords.ui.WordsViewModel
 
 @Composable
-fun NavigationWrapper() {
+fun NavigationWrapper(wordsViewModel: WordsViewModel) {
+
     val navController = rememberNavController()
+
     NavHost(navController = navController, startDestination = SignIn){
 
         composable<SignIn>{
@@ -20,7 +23,8 @@ fun NavigationWrapper() {
         }
 
         composable<Home> {
-            HomeScreen( navigateToTutorial = {navController.navigate(Tutorial)},
+            HomeScreen(wordsViewModel,
+            navigateToTutorial = {navController.navigate(Tutorial)},
                         navigateToGame = {navController.navigate(Game)},
                         navigateToEditWord = {navController.navigate(EditWord)},
                         navigateToAddWord = {navController.navigate(AddWord)} )
