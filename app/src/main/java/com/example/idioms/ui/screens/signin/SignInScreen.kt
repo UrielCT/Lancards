@@ -10,8 +10,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import com.example.idioms.R
+import com.example.idioms.ui.components.HeaderWithBack
 
 
 @Composable
@@ -29,35 +29,35 @@ fun SignInScreen(
             .background(MaterialTheme.colorScheme.background)
             .systemBarsPadding()
             .padding(dimensionResource(R.dimen.common_padding_default)),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text("Sign In",
-            fontSize = dimensionResource(R.dimen.text_size_large).value.sp,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        HeaderWithBack(title = stringResource(R.string.sign_in))
 
         Spacer(Modifier.weight(1f))
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = email,
             onValueChange = { email = it },
-            label = { Text(stringResource(R.string.email)) }
+            label = { Text(stringResource(R.string.email)) },
+            singleLine = true
         )
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = password,
             onValueChange = { password = it },
             label = { Text(stringResource(R.string.password)) },
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            singleLine = true
         )
 
         Button(
             onClick = { navToHome() },
-            modifier = Modifier.padding(top = dimensionResource(R.dimen.common_padding_min))
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.common_padding_default))
         ) {
-            Text(stringResource(R.string.btn_sign_in))
+            Text(stringResource(R.string.sign_in))
         }
         Spacer(Modifier.weight(1f))
 

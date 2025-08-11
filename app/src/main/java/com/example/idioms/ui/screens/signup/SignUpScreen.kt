@@ -1,77 +1,83 @@
 package com.example.idioms.ui.screens.signup
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.example.idioms.R
+import com.example.idioms.ui.components.HeaderWithBack
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
     navToHome: () -> Unit,
     navBack: () -> Unit,
-/*onSignUp: (String, String) -> Unit*/
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
-    Scaffold(
-        content = { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .systemBarsPadding()
+            .padding(dimensionResource(R.dimen.common_padding_default)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-                Box(Modifier.fillMaxWidth()) {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
-                    }
-                    Text("Sign Up")
-                }
+        HeaderWithBack(
+            title = stringResource(R.string.sign_up),
+            onBack = navBack
+        )
 
+        Spacer(Modifier.weight(1f))
 
-                Spacer(Modifier.weight(1f))
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = email,
+            onValueChange = { email = it },
+            label = { Text(stringResource(R.string.email)) },
+            singleLine = true
+        )
 
-                OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    visualTransformation = PasswordVisualTransformation()
-                )
-                OutlinedTextField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
-                    label = { Text("Confirm Password") },
-                    visualTransformation = PasswordVisualTransformation()
-                )
-                Button(onClick = { /*onSignUp(email, password)*/ },
-                    modifier = Modifier.padding(top = 8.dp)
-                ) {
-                    Text("Sign Up")
-                }
-                TextButton(onClick = { navToHome() }/*navToSignIn*/) {
-                    Text("Already have an account? Sign In")
-                }
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = password,
+            onValueChange = { password = it },
+            label = { Text(stringResource(R.string.password)) },
+            visualTransformation = PasswordVisualTransformation(),
+            singleLine = true
+        )
 
-                Spacer(Modifier.weight(1f))
-
-            }
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text(stringResource(R.string.confirm_password)) },
+            visualTransformation = PasswordVisualTransformation(),
+            singleLine = true
+        )
+        Button(onClick = { navToHome() },
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.common_padding_default))
+        ) {
+            Text(stringResource(R.string.sign_up))
         }
-    )
+
+        Spacer(Modifier.weight(1f))
+
+        TextButton(onClick = { navBack() }
+        ) {
+            Text(stringResource(R.string.advice_sign_in))
+        }
+
+    }
 }
 
 

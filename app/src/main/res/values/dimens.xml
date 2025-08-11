@@ -7,6 +7,7 @@
     <dimen name="common_padding_default">16dp</dimen>
     <dimen name="common_padding_middle">24dp</dimen>
     <dimen name="common_padding_large">32dp</dimen>
+    <dimen name="common_padding_large_med">48dp</dimen>
     <dimen name="common_padding_x_large">64dp</dimen>
 
     <dimen name="text_size_small">12sp</dimen>
