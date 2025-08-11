@@ -1,4 +1,4 @@
-package com.example.idioms
+package com.example.idioms.ui.screens.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +17,7 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.School
-import com.example.idioms.addwords.ui.WordsViewModel
+import com.example.idioms.ui.viewmodels.WordsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package com.example.idioms
+package com.example.idioms.ui.screens.game
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

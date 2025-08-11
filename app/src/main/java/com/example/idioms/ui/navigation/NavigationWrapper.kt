@@ -1,15 +1,16 @@
-package com.example.idioms.core.navigation
+package com.example.idioms.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.idioms.AddWordScreen
-import com.example.idioms.GameScreen
-import com.example.idioms.HomeScreen
-import com.example.idioms.SignInScreen
-import com.example.idioms.TutorialScreen
-import com.example.idioms.addwords.ui.WordsViewModel
+import com.example.idioms.ui.screens.addword.AddWordScreen
+import com.example.idioms.ui.screens.game.GameScreen
+import com.example.idioms.ui.screens.home.HomeScreen
+import com.example.idioms.ui.screens.signin.SignInScreen
+import com.example.idioms.ui.screens.signup.SignUpScreen
+import com.example.idioms.ui.screens.tutorial.TutorialScreen
+import com.example.idioms.ui.viewmodels.WordsViewModel
 
 @Composable
 fun NavigationWrapper(wordsViewModel: WordsViewModel) {
@@ -19,7 +20,16 @@ fun NavigationWrapper(wordsViewModel: WordsViewModel) {
     NavHost(navController = navController, startDestination = SignIn){
 
         composable<SignIn>{
-            SignInScreen(navigateToHome = {navController.navigate(Home)} )
+            SignInScreen(
+                navToHome = { navController.navigate(Home) },
+                navToSignUp = { navController.navigate(SignUp) },
+            )
+        }
+        composable<SignUp>{
+            SignUpScreen(
+                navToHome = { navController.navigate(Home) },
+                navBack = { navController.popBackStack() },
+            )
         }
 
         composable<Home> {
