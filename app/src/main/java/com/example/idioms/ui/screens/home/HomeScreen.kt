@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.idioms.R
+import com.example.idioms.ui.components.TutorialDialog
 import com.example.idioms.ui.models.Word
 import com.example.idioms.ui.viewmodels.WordsViewModel
 import com.example.idioms.utils.words
@@ -44,7 +45,6 @@ import com.example.idioms.utils.words
 @Composable
 fun HomeScreen(
     wordsViewModel: WordsViewModel,
-    navToTutorial: () -> Unit,
     navToGame: () -> Unit,
     navToEditWord: () -> Unit,
     navToAddWord: () -> Unit,
@@ -54,6 +54,7 @@ fun HomeScreen(
     val wordsAmount by remember { mutableIntStateOf(1000) }
     var hasFocus by remember { mutableStateOf(false) }
     var selectedWord by remember { mutableStateOf<Word?>(null) }
+    var showTutorial by remember { mutableStateOf(false) }
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -166,7 +167,7 @@ fun HomeScreen(
                         .spacedBy(dimensionResource(R.dimen.common_padding_large)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { navToTutorial() }) {
+                    IconButton(onClick = { showTutorial = true }) {
                         Icon(Icons.Default.School, contentDescription = "Tutorial")
                     }
                     Button(
@@ -230,6 +231,9 @@ fun HomeScreen(
             )
         }
 
+        if(showTutorial){
+            TutorialDialog( onExit = {showTutorial = false})
+        }
     }
 }
 
@@ -284,5 +288,5 @@ fun WordCard(
 fun HomeScreenPreview() {
     val vm: WordsViewModel=WordsViewModel()
 
-    HomeScreen(wordsViewModel = vm,{},{},{},{})
+    HomeScreen(wordsViewModel = vm,{},{},{})
 }

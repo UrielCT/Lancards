@@ -14,4 +14,13 @@
     <string name="translation">Translation: %1$s</string>
     <string name="pronunciation">Pronunciation: %1$s</string>
     <string name="association">Association: %1$s</string>
+
+    <string name="title_description">Description</string>
+    <string name="txt_description">"Esta app ayuda a aprender idiomas mediante asociaciones inverosímiles, lo que facilita la memorización de palabras. En lugar de solo mostrar la palabra y su traducción, permite crear conexiones absurdas o visuales entre ambas, haciéndolas más memorables."</string>
+
+    <string name="title_steps">Steps</string>
+    <string name="txt_steps">Agregar una palabra: El usuario ingresa una palabra en el idioma que está aprendiendo. Añadir la traducción: Se introduce su significado en el idioma nativo. Crear una asociación: La app sugiere o permite al usuario escribir una conexión inverosímil entre ambas palabras. Guardar y repasar: Se guarda la asociación para repasarla más tarde mediante tarjetas o juegos interactivos.</string>
+    <string name="title_example">Ejemplo</string>
+    <string name="title_tutorial">Tutorial</string>
+
 </resources>

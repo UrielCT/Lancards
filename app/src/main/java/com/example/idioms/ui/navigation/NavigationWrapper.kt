@@ -9,7 +9,6 @@ import com.example.idioms.ui.screens.game.GameScreen
 import com.example.idioms.ui.screens.home.HomeScreen
 import com.example.idioms.ui.screens.signin.SignInScreen
 import com.example.idioms.ui.screens.signup.SignUpScreen
-import com.example.idioms.ui.screens.tutorial.TutorialScreen
 import com.example.idioms.ui.viewmodels.WordsViewModel
 
 @Composable
@@ -35,16 +34,12 @@ fun NavigationWrapper(wordsViewModel: WordsViewModel) {
         composable<Home> {
             HomeScreen(
                 wordsViewModel,
-                navToTutorial = { navController.navigate(Tutorial) },
                 navToGame = { navController.navigate(Game) },
                 navToEditWord = { navController.navigate(EditWord) },
                 navToAddWord = { navController.navigate(AddWord) }
             )
         }
 
-        composable<Tutorial>{
-            TutorialScreen( {navController.popBackStack() })
-        }
 
         composable<Game>{
             GameScreen( {navController.popBackStack() } )
