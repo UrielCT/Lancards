@@ -33,11 +33,13 @@ fun NavigationWrapper(wordsViewModel: WordsViewModel) {
         }
 
         composable<Home> {
-            HomeScreen(wordsViewModel,
-            navigateToTutorial = {navController.navigate(Tutorial)},
-                        navigateToGame = {navController.navigate(Game)},
-                        navigateToEditWord = {navController.navigate(EditWord)},
-                        navigateToAddWord = {navController.navigate(AddWord)} )
+            HomeScreen(
+                wordsViewModel,
+                navToTutorial = { navController.navigate(Tutorial) },
+                navToGame = { navController.navigate(Game) },
+                navToEditWord = { navController.navigate(EditWord) },
+                navToAddWord = { navController.navigate(AddWord) }
+            )
         }
 
         composable<Tutorial>{

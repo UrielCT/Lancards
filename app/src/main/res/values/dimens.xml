@@ -12,7 +12,11 @@
 
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_medium_plus">18sp</dimen>
+    <dimen name="text_size_medium_large">20sp</dimen>
     <dimen name="text_size_large">24sp</dimen>
 
+
+    <dimen name="home_bottombar_height">60dp</dimen>
 
 </resources>
