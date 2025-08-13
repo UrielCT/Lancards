@@ -23,4 +23,17 @@
     <string name="title_example">Ejemplo</string>
     <string name="title_tutorial">Tutorial</string>
 
+
+    <string name="tf_word">Word</string>
+    <string name="tf_translation">Translation</string>
+    <string name="tf_pronunciation">Pronunciation</string>
+    <string name="tf_association">Association</string>
+    <string name="tf_keyword_a">Keyword A</string>
+    <string name="tf_keyword_b">Keyword B</string>
+    <string name="tf_keyword_c">Keyword C</string>
+    <string name="add_word">Add Word</string>
+    <string name="categories">Category</string>
+    <string name="original_language">Original Language</string>
+    <string name="translated_language">Translated Language</string>
+
 </resources>
