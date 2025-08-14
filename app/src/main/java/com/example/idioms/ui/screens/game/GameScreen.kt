@@ -8,87 +8,73 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import java.util.Date
+import com.example.idioms.R
+import com.example.idioms.ui.components.MyDropdown
+import com.example.idioms.ui.models.Word
+import com.example.idioms.utils.GameState
+import com.example.idioms.utils.words
 
-enum class Estado {
- STOPPED, RUNNING, FINISHED
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreen(navigateBack:() -> Unit) {
-    var estado by remember { mutableStateOf(Estado.STOPPED) }
-    var correctas by remember { mutableStateOf(0) }
-    var orden by remember { mutableStateOf("Mas Nuevas") }
-    var juego by remember { mutableStateOf("Recordar traducción") }
-    var palabra by remember { mutableStateOf("") }
-    var cantidad by remember { mutableStateOf("") }
-    var clase by remember { mutableStateOf("") }
-    var traduccion by remember { mutableStateOf("") }
-    var idiomaOrigen by remember { mutableStateOf("") }
-    var idiomaTraduccion by remember { mutableStateOf("") }
-    var pronunciacion by remember { mutableStateOf("") }
-    var palabraClaveA by remember { mutableStateOf("") }
-    var palabraClaveB by remember { mutableStateOf("") }
-    var palabraClaveC by remember { mutableStateOf("") }
+fun GameScreen(navBack:() -> Unit) {
+    var gameState by remember { mutableStateOf(GameState.STOPPED) }
+    var correctWords by remember { mutableStateOf(0) }
+
+    var order by remember { mutableStateOf("Mas Nuevas") }
+    var game by remember { mutableStateOf("Recordar traducción") }
+    var word by remember { mutableStateOf("") }
+    var translation by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("Todas") }
+    var originalLang by remember { mutableStateOf("Todos") }
+    var translatedLang by remember { mutableStateOf("Todos") }
+
 
     var isCheckEnabled by remember { mutableStateOf(true) }
     var isNextEnabled by remember { mutableStateOf(false) }
     var isCorrect by remember { mutableStateOf<Boolean?>(null) }
-    var textColor by remember { mutableStateOf<Color>(Color.Black) }
 
+    val defaultTextColor = MaterialTheme.colorScheme.onBackground
+    var textColor by remember { mutableStateOf(defaultTextColor) }
 
     var index by remember { mutableStateOf(0) }
-    var cantidadCorrectas by remember { mutableStateOf(0) }
-    var palabrasFinales = listOf<Word>()
+    var wordsList = listOf<Word>()
 
-    // trae lista de palabras
-    val palabras = listOf(
-        Word("Gato", "Cat", "kæt", "Un gato atrapado en una red", "Español", "Inglés", "Verbo", Date(1640995200000)), // 1 enero 2022
-        Word("Perro", "Dog", "dɔg", "Un perro con un hueso", "Español", "Inglés", "Verbo", Date(1672531200000)), // 1 enero 2023
-        Word("Casa", "House", "haʊs", "Una casa con un tejado rojo", "Español", "Alemán", "Sustantivo", Date(1704067200000)), // 1 enero 2024
-        Word("Manzana", "Apple", "ˈæp.l̩", "Una manzana roja brillante", "Español", "Ruso", "Adjetivo", Date(1711929600000)), // 1 abril 2024
-        Word("Reloj", "Clock", "klɑːk", "Un reloj con agujas grandes", "Español", "Ruso", "Verbo", Date(1714608000000)) // 1 mayo 2024
-    )
+    val originList = listOf("Todos") + words.map { it.originalLang }.distinct()
+    val tradList = listOf("Todos") + words.map { it.translatedLang }.distinct()
+    val categoryList = listOf("Todas") + words.map { it.category }.distinct()
+
+    val orderList = listOf("Mas Nuevas","Mas Antiguas","Fecha Random", "Alfabético", "Alfabético Inverso", )
+    val gameList = listOf("Recordar traducción", "Recordar palabra")
 
 
-    val originList = listOf("Todos") + palabras.map { it.idiomaOrigen }.distinct()
-    val tradList = listOf("Todos") + palabras.map { it.idiomaTrad }.distinct()
-    val claseList = listOf("Todas") + palabras.map { it.clase }.distinct()
-
-
-    val ordenList = listOf("Mas Nuevas","Mas Antiguas","Fecha Random", "Alfabético", "Alfabético Inverso", )
-    val juegoList = listOf("Recordar traducción", "Recordar palabra")
-
-
-
-    var filteredWords = remember(idiomaOrigen, idiomaTraduccion, clase, orden) {
-        palabras.filter {
-            (idiomaOrigen.isEmpty() || idiomaOrigen == "Todos" || it.idiomaOrigen == idiomaOrigen) &&
-                    (idiomaTraduccion.isEmpty() || idiomaTraduccion == "Todos" || it.idiomaTrad == idiomaTraduccion) &&
-                    (clase.isEmpty() || clase == "Todas" || it.clase == clase)
-        }.let { listaFiltrada ->
-            when (orden) {
-                "Mas Nuevas" -> listaFiltrada.sortedByDescending { it.fecha }
-                "Mas Antiguas" -> listaFiltrada.sortedBy { it.fecha }
-                "Fecha Random" -> listaFiltrada.shuffled()
-                "Alfabético" -> listaFiltrada.sortedBy { it.palabra }
-                "Alfabético Inverso" -> listaFiltrada.sortedByDescending { it.palabra }
-                else -> listaFiltrada
+    var filteredWords = remember(originalLang, translatedLang, category, order) {
+        words.filter {
+            (originalLang.isEmpty() || originalLang == "Todos" || it.originalLang == originalLang) &&
+                    (translatedLang.isEmpty() || translatedLang == "Todos" || it.translatedLang == translatedLang) &&
+                    (category.isEmpty() || category == "Todas" || it.category == category)
+        }.let { filteredList ->
+            when (order) {
+                "Mas Nuevas" -> filteredList.sortedByDescending { it.date }
+                "Mas Antiguas" -> filteredList.sortedBy { it.date }
+                "Fecha Random" -> filteredList.shuffled()
+                "Alfabético" -> filteredList.sortedBy { it.word }
+                "Alfabético Inverso" -> filteredList.sortedByDescending { it.word }
+                else -> filteredList
             }
         }
-
     }
 
-    val cantList = remember(filteredWords) {
-        cantidad = 0.toString()
+    val amountList = remember(filteredWords) {
+        amount = 0.toString()
         (1..filteredWords.size).map { it.toString() }
     }
-
 
     Scaffold(
         topBar = {
@@ -96,158 +82,167 @@ fun GameScreen(navigateBack:() -> Unit) {
                 title = {
                     Box(modifier = Modifier.fillMaxWidth()) {
                         IconButton(
-                            onClick = { navigateBack()},
+                            onClick = { navBack() },
                             modifier = Modifier.align(Alignment.CenterStart)
                         ) {
                             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
                         }
                         Text(
-                            text = "Juego de palabras",
+                            text = stringResource(R.string.words_game),
                             modifier = Modifier.align(Alignment.Center),
-                            fontSize = 20.sp,
+                            fontSize = dimensionResource(R.dimen.text_size_medium_large).value.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
             )
         },
 
-
         content = { paddingValues ->
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
+                    .fillMaxSize()
+                    .padding(dimensionResource(R.dimen.common_padding_default)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.common_padding_mini)),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                when (gameState) {
+                    GameState.STOPPED -> {
 
-                when (estado) {
-                    Estado.STOPPED -> {
+                        MyDropdown(
+                            label = stringResource(R.string.original_language),
+                            options = originList,
+                            selectedOption = originalLang,
+                            onOptionSelected = { originalLang = it },
+                            modifier = Modifier.weight(1f)
+                        )
 
+                        MyDropdown(
+                            label = stringResource(R.string.translated_language),
+                            options = tradList,
+                            selectedOption = translatedLang,
+                            onOptionSelected = { translatedLang = it },
+                            modifier = Modifier.weight(1f)
+                        )
 
-                        Column {
+                        MyDropdown(
+                            label = stringResource(R.string.categories),
+                            options = categoryList,
+                            selectedOption = category,
+                            onOptionSelected = { category = it },
+                            modifier = Modifier.weight(1f)
+                        )
 
-                            DropdownMenuBox(
-                                label = "Idioma de origen",
-                                options = originList,
-                                selectedOption = idiomaOrigen,
-                                onOptionSelected = { idiomaOrigen = it },
-                                enabled = true
-                            )
-                            DropdownMenuBox(
-                                label = "Idioma de traducción",
-                                options = tradList,
-                                selectedOption = idiomaTraduccion,
-                                onOptionSelected = { idiomaTraduccion = it },
-                                enabled = true
-                            )
-                            DropdownMenuBox(
-                                label = "Clase",
-                                options = claseList,
-                                selectedOption = clase,
-                                onOptionSelected = { clase = it },
-                                enabled = true
-                            )
-                            DropdownMenuBox(
-                                label = "Orden",
-                                options = ordenList,
-                                selectedOption = orden,
-                                onOptionSelected = { orden = it },
-                                enabled = true
-                            )
-                            DropdownMenuBox(
-                                label = "Cantidad",
-                                options = cantList,
-                                selectedOption = cantidad,
-                                onOptionSelected = { cantidad = it },
-                                enabled = filteredWords.isNotEmpty()
-                            )
+                        MyDropdown(
+                            label = stringResource(R.string.order),
+                            options = orderList,
+                            selectedOption = order,
+                            onOptionSelected = { order = it },
+                            modifier = Modifier.weight(1f)
+                        )
 
-                            DropdownMenuBox(
-                                label = "Juego",
-                                options = juegoList,
-                                selectedOption = juego,
-                                onOptionSelected = { juego = it },
-                                enabled = true
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
+                        MyDropdown(
+                            label = stringResource(R.string.amount),
+                            options = amountList,
+                            selectedOption = amount,
+                            onOptionSelected = { amount = it },
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        MyDropdown(
+                            label = stringResource(R.string.game),
+                            options = gameList,
+                            selectedOption = game,
+                            onOptionSelected = { game = it },
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Spacer(modifier = Modifier
+                            .height(dimensionResource(R.dimen.common_padding_min)))
+                        Text(
+                            text = stringResource(R.string.filtered_words, filteredWords.size),
+                            fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
+                        Spacer(modifier = Modifier
+                            .height(dimensionResource(R.dimen.common_padding_min)))
+
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    wordsList = filteredWords
+                                    filteredWords = filteredWords.take(amount.toInt())
+                                    gameState = GameState.RUNNING
+                                          },
+                                enabled = filteredWords.isNotEmpty() && amount > 0.toString()
+                        ) {
                             Text(
-                                text = "Palabras: " +
-                                        filteredWords.size,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.Black
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            Button(
-                                    onClick = {
-                                        palabrasFinales = filteredWords
-                                        filteredWords = filteredWords.take(cantidad.toInt())
-                                        estado = Estado.RUNNING
-                                              },
-                                    enabled = filteredWords.isNotEmpty() && cantidad > 0.toString()
-                            ) {
-                                Text("Play")
-                            }
+                                text = stringResource(R.string.play),
+                                fontSize = dimensionResource(R.dimen.text_size_medium_large).value.sp)
                         }
 
                     }
 
-                    Estado.RUNNING -> {
-
-                        // acumular las correctas
-                        // poner boton para mostrar una pista
+                    GameState.RUNNING -> {
 
                         Text(
                             text = "${index + 1} / ${filteredWords.size}",
-                            fontSize = 20.sp,
+                            fontSize = dimensionResource(R.dimen.text_size_medium_large).value.sp,
                             fontWeight = FontWeight.Bold,
-                            color =  Color.Blue
+                            color =  Color.LightGray
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
 
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_default)))
 
                         Text(
-                            text = getText(juego, index, filteredWords.size, filteredWords[index].palabra, filteredWords[index].traduccion),
-                            fontSize = 24.sp,
+                            text = getText(game, index, filteredWords.size,
+                                filteredWords[index].word, filteredWords[index].translation),
+                            fontSize = dimensionResource(R.dimen.text_size_large_plus).value.sp,
                             fontWeight = FontWeight.Bold,
                             color = textColor
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_default)))
+
                         Text(
-                            text = getCorrectText(juego, isCorrect, filteredWords[index].palabra, filteredWords[index].traduccion),
-                            fontSize = 24.sp,
+                            text = getCorrectText(game, isCorrect, filteredWords[index].word,
+                                filteredWords[index].translation),
+                            fontSize = dimensionResource(R.dimen.text_size_large).value.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Green
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_default)))
                         //si juego es 1- poner palabra,si es 2- poner traduccion
                         OutlinedTextField(
-                            value = if (juego == "Recordar traducción") traduccion else palabra,
+                            value = if (game == "Recordar traducción") translation else word,
                             onValueChange = {
                                 val sanitizedText = it.replace("\n", "").replace("\r", "") // Elimina saltos de línea
-                                if (juego == "Recordar traducción") traduccion = sanitizedText else palabra = sanitizedText
+                                if (game == "Recordar traducción") translation = sanitizedText else word = sanitizedText
                             },
                             label = { Text("Ingresá la forma correcta") }
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_default)))
 
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            horizontalArrangement = Arrangement
+                                .spacedBy(dimensionResource(R.dimen.common_padding_default)),
                         ) {
                             Button(
+                                modifier = Modifier.weight(1f),
                                 onClick = {
-                                    if(juego == "Recordar traducción"){
-                                        if(traduccion.replace(" ", "").uppercase() == filteredWords[index].traduccion.replace(" ", "").uppercase()){
-                                            correctas++
+                                    if(game == "Recordar traducción"){
+                                        if(translation.replace(" ", "")
+                                            .uppercase() == filteredWords[index].translation
+                                                .replace(" ", "").uppercase()){
+                                            correctWords++
                                             isCorrect = true
                                             textColor = Color.Green
                                         }else {
@@ -255,82 +250,84 @@ fun GameScreen(navigateBack:() -> Unit) {
                                             isCorrect = false
                                             textColor = Color.Red
                                         }
-                                    }else if(juego == "Recordar palabra"){
-                                        if(palabra.replace(" ", "").uppercase() == filteredWords[index].palabra.replace(" ", "").uppercase()){
-                                            correctas++
+                                    }else if(game == "Recordar palabra"){
+                                        if(word.replace(" ", "")
+                                            .uppercase() == filteredWords[index].word
+                                                .replace(" ", "").uppercase()){
+                                            correctWords++
                                             isCorrect = true
                                             textColor = Color.Green
                                         }else {
                                             isCorrect = false
-                                            // Agregar a una lista de palabras para practicar
                                             textColor = Color.Red
                                         }
                                     }
-                                    // poner if para compara los textos segun el juego
-                                    // poner los dos textos en mayuscula para comparar
 
                                     isCheckEnabled = false
                                     isNextEnabled = true
                                 },
                                 enabled = isCheckEnabled
                             ) {
-                                Text("Check")
+                                Text(stringResource(R.string.check))
                             }
 
-
                             Button(
+                                modifier = Modifier.weight(1f),
                                 onClick = {
-                                    traduccion = ""
-                                    palabra = ""
+                                    translation = ""
+                                    word = ""
                                     isCorrect = null
+                                    textColor = defaultTextColor
+                                    isCheckEnabled = true
+                                    isNextEnabled = false
                                     if (index < filteredWords.size - 1) {
-                                        textColor = Color.Black
                                         index++
-                                        isCheckEnabled = true
-                                        isNextEnabled = false
                                     } else {
-                                        textColor = Color.Black
-                                        estado = Estado.FINISHED
+                                        gameState = GameState.FINISHED
                                         index = 0
-                                        isCheckEnabled = true
-                                        isNextEnabled = false
                                     }
                                 },
                                 enabled = isNextEnabled
                             ) {
-                                Text("Next")
+                                Text(stringResource(R.string.next))
                             }
 
                         }
                     }
 
-                    Estado.FINISHED -> {
-
-
-                        Text(
-                            text = "Correctas: $correctas de ${filteredWords.size}",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(16.dp))
+                    GameState.FINISHED -> {
 
                         Text(
-                            text = "Orden: $orden",
-                            fontSize = 20.sp,
+                            text = stringResource(
+                                R.string.correct_words_text,
+                                correctWords,
+                                filteredWords.size
+                            ),
+                            fontSize = dimensionResource(R.dimen.text_size_medium_large).value.sp,
                             fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Spacer(Modifier.height(dimensionResource(R.dimen.common_padding_default)))
 
                         Text(
-                            text = "Juego: $juego",
-                            fontSize = 20.sp,
+                            text = stringResource(R.string.order_text, order),
+                            fontSize = dimensionResource(R.dimen.text_size_medium_large).value.sp,
                             fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_default)))
+
+                        Text(
+                            text = stringResource(R.string.game_text, game),
+                            fontSize = dimensionResource(R.dimen.text_size_medium_large).value.sp,
+                            fontWeight = FontWeight.Bold)
+
+                        Spacer(Modifier.height(dimensionResource(R.dimen.common_padding_default)))
 
                         Button(onClick = {
-                            filteredWords = palabrasFinales
-                            correctas = 0
-                            estado = Estado.STOPPED
+                            filteredWords = wordsList
+                            correctWords = 0
+                            gameState = GameState.STOPPED
                         }) {
-                            Text("Again")
+                            Text(stringResource(R.string.again))
                         }
 
                     }
@@ -350,7 +347,6 @@ fun getText(juego: String, index: Int, size: Int, palabra: String, traduccion: S
     }
 }
 
-
 fun getCorrectText(juego: String, isCorrect: Boolean?, palabra: String, traduccion: String): String {
    return if (juego == "Recordar traducción"){
        if(isCorrect == false) traduccion else ""
@@ -358,70 +354,3 @@ fun getCorrectText(juego: String, isCorrect: Boolean?, palabra: String, traducci
        if(isCorrect == false) palabra else ""
    }
 }
-
-
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownMenuBox(
-    label: String,
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit,
-    enabled: Boolean
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it }
-    ) {
-        OutlinedTextField(
-            value = selectedOption,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = {
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(
-                        painter = painterResource(id = android.R.drawable.arrow_down_float),
-                        contentDescription = "Expand"
-                    )
-                }
-            },
-            enabled = enabled,
-            modifier = Modifier.menuAnchor()
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
-
-data class Word(
-    val palabra: String,
-    val traduccion: String,
-    val pronunciacion: String,
-    val asociacion: String,
-    val idiomaOrigen:String,
-    val idiomaTrad:String,
-    val clase:String,
-    val fecha: Date
-
-)
-

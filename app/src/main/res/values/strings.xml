@@ -31,9 +31,21 @@
     <string name="tf_keyword_a">Keyword A</string>
     <string name="tf_keyword_b">Keyword B</string>
     <string name="tf_keyword_c">Keyword C</string>
+    <string name="order">Order</string>
+    <string name="game">Game</string>
+    <string name="amount">Amount</string>
     <string name="add_word">Add Word</string>
     <string name="categories">Category</string>
     <string name="original_language">Original Language</string>
     <string name="translated_language">Translated Language</string>
+    <string name="words_game">Words Game</string>
+    <string name="play">Play</string>
+    <string name="filtered_words">Filtered words: %1$s</string>
+    <string name="check">Check</string>
+    <string name="next">Next</string>
+    <string name="correct_words_text">Correct: %1$s of %2$s</string>
+    <string name="order_text">Order: %1$s</string>
+    <string name="game_text">Game: %1$s</string>
+    <string name="again">Again</string>
 
 </resources>

@@ -24,6 +24,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.idioms.R
+import com.example.idioms.ui.components.MyDropdown
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,6 +146,7 @@ fun AddWordScreen(navBack: () -> Unit) {
     }
 }
 
+
 @Composable
 private fun MyEditText(value:String, label: String,onValueChange: (String) -> Unit ){
     OutlinedTextField(
@@ -154,49 +156,6 @@ private fun MyEditText(value:String, label: String,onValueChange: (String) -> Un
         modifier = Modifier.fillMaxWidth(),
         maxLines = 1
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MyDropdown(
-    label: String,
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = modifier
-    ) {
-        OutlinedTextField(
-            value = selectedOption,
-            onValueChange = {},
-            label = { Text(label) },
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
 }
 
 

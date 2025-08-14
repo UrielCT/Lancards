@@ -42,7 +42,9 @@ fun NavigationWrapper(wordsViewModel: WordsViewModel) {
 
 
         composable<Game>{
-            GameScreen( {navController.popBackStack() } )
+            GameScreen(
+                navBack = { navController.popBackStack() }
+            )
         }
 
         composable<EditWord>{
