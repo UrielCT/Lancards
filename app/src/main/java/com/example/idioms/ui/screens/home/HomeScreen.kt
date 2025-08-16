@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.School
@@ -25,7 +26,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.idioms.R
+import com.example.idioms.ui.components.MyDropdown
 import com.example.idioms.ui.components.TutorialDialog
 import com.example.idioms.ui.models.Word
 import com.example.idioms.ui.viewmodels.WordsViewModel
@@ -48,7 +49,18 @@ fun HomeScreen(
     navToGame: () -> Unit,
     navToEditWord: () -> Unit,
     navToAddWord: () -> Unit,
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit
 ) {
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showFilters by remember { mutableStateOf(false) }
+
+    val clases = listOf("Clase 1", "Clase 2", "Clase 3")
+    val idiomas = listOf("Español", "Inglés", "Francés")
+    var claseSeleccionada by remember { mutableStateOf(clases[0]) }
+    var idiomaOrigen by remember { mutableStateOf(idiomas[0]) }
+    var idiomaDestino by remember { mutableStateOf(idiomas[1]) }
 
     var input by remember { mutableStateOf("") }
     val wordsAmount by remember { mutableIntStateOf(1000) }
@@ -56,7 +68,6 @@ fun HomeScreen(
     var selectedWord by remember { mutableStateOf<Word?>(null) }
     var showTutorial by remember { mutableStateOf(false) }
 
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
 
@@ -74,11 +85,15 @@ fun HomeScreen(
             TopAppBar(
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-
-                        }
+                        onClick = { onToggleTheme() }
                     ) {
-                        Icon(imageVector = Icons.Default.NightsStay, contentDescription = "Night mode")
+                        Icon(
+                            imageVector = if (isDarkTheme)
+                                Icons.Default.LightMode
+                            else
+                                Icons.Default.NightsStay,
+                            contentDescription = "Toggle Theme"
+                        )
                     }
                 },
                 title = {
@@ -91,7 +106,9 @@ fun HomeScreen(
                         OutlinedTextField(
                             modifier = Modifier
                                 .weight(1f)
-                                .onFocusChanged { focusState -> hasFocus = focusState.isFocused },
+                                .onFocusChanged { focusState ->
+                                    hasFocus = focusState.isFocused
+                                },
                             value = input,
                             onValueChange = { input = it },
                             placeholder = { Text(stringResource(R.string.txt_search)) },
@@ -120,7 +137,8 @@ fun HomeScreen(
                             },
                             singleLine = true,
                             textStyle = TextStyle(
-                                fontSize = dimensionResource(R.dimen.text_size_medium_plus).value.sp),
+                                fontSize = dimensionResource(R.dimen.text_size_medium_plus).value.sp
+                            ),
                             shape = RoundedCornerShape(dimensionResource(R.dimen.common_padding_min)),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 containerColor = Color.Transparent
@@ -137,16 +155,18 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
-                        Icon(imageVector = Icons.Default.FilterList,
-                            contentDescription = "Filter")
+                    IconButton(onClick = { showFilters = true }) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = "Filter"
+                        )
                     }
                 }
             )
         },
 
         floatingActionButton = {
-            FloatingActionButton( onClick = { navToAddWord() } ) {
+            FloatingActionButton(onClick = { navToAddWord() }) {
                 Icon(Icons.Default.Add, contentDescription = null)
             }
         },
@@ -174,9 +194,11 @@ fun HomeScreen(
                         onClick = { navToGame() },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(text = stringResource(R.string.btn_play_game),
+                        Text(
+                            text = stringResource(R.string.btn_play_game),
                             fontSize = dimensionResource(R.dimen.text_size_medium_large).value.sp,
-                            fontWeight = FontWeight.Bold)
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -195,7 +217,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_min)))
                 WordCard(
                     word = word,
-                    onClick = { selectedWord =word } )
+                    onClick = { selectedWord = word })
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_min)))
             }
         }
@@ -231,14 +253,66 @@ fun HomeScreen(
             )
         }
 
-        if(showTutorial){
-            TutorialDialog( onExit = {showTutorial = false})
+        if (showTutorial) {
+            TutorialDialog(onExit = { showTutorial = false })
         }
+
+
+        if (showFilters) {
+
+
+
+            ModalBottomSheet(
+                sheetState = sheetState,
+                onDismissRequest = { showFilters = false }
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(dimensionResource(R.dimen.common_padding_default))
+                ) {
+                    Text("Filtros", style = MaterialTheme.typography.titleLarge)
+                    Spacer(Modifier.height(dimensionResource(R.dimen.common_padding_default)))
+
+                    MyDropdown(
+                        label = stringResource(R.string.categories),
+                        options = clases,
+                        selectedOption = claseSeleccionada,
+                        onOptionSelected = { claseSeleccionada = it },
+                        modifier = Modifier.padding(
+                            horizontal = dimensionResource(R.dimen.common_padding_default),
+                            vertical = dimensionResource(R.dimen.common_padding_min))
+                    )
+
+                    MyDropdown(
+                        label = stringResource(R.string.original_language),
+                        options = idiomas,
+                        selectedOption = idiomaOrigen,
+                        onOptionSelected = { idiomaOrigen = it },
+                        modifier = Modifier.padding(
+                            horizontal = dimensionResource(R.dimen.common_padding_default),
+                            vertical = dimensionResource(R.dimen.common_padding_min))
+                    )
+                    MyDropdown(
+                        label = stringResource(R.string.translated_language),
+                        options = idiomas,
+                        selectedOption = idiomaDestino,
+                        onOptionSelected = { idiomaDestino = it },
+                        modifier = Modifier.padding(
+                            horizontal = dimensionResource(R.dimen.common_padding_default),
+                            vertical = dimensionResource(R.dimen.common_padding_min))
+                    )
+                }
+            }
+        }
+
+
     }
+
+
 }
 
 @Composable
-fun WordCard(
+private fun WordCard(
     onClick: () -> Unit,
     word: Word
 ) {
@@ -255,38 +329,44 @@ fun WordCard(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = word.word,
+            Text(
+                text = word.word,
                 fontSize = dimensionResource(R.dimen.text_size_medium_large).value.sp,
-                fontWeight = FontWeight.Bold)
+                fontWeight = FontWeight.Bold
+            )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_min)))
 
-            Text(text = word.translation,
-                fontSize = dimensionResource(R.dimen.text_size_medium_plus).value.sp)
+            Text(
+                text = word.translation,
+                fontSize = dimensionResource(R.dimen.text_size_medium_plus).value.sp
+            )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_min)))
 
-            Text(text = word.pronunciation,
-                fontSize = dimensionResource(R.dimen.text_size_medium).value.sp)
+            Text(
+                text = word.pronunciation,
+                fontSize = dimensionResource(R.dimen.text_size_medium).value.sp
+            )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_min)))
 
-            Text(text = word.association,
+            Text(
+                text = word.association,
                 fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
-                textAlign = TextAlign.Start)
+                textAlign = TextAlign.Start
+            )
 
         }
     }
 }
 
 
-
-
 @SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    val vm: WordsViewModel=WordsViewModel()
+    val vm: WordsViewModel = WordsViewModel()
 
-    HomeScreen(wordsViewModel = vm,{},{},{})
+    HomeScreen(wordsViewModel = vm, {}, {}, {},true,{})
 }

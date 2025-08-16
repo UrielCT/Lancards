@@ -12,7 +12,11 @@ import com.example.idioms.ui.screens.signup.SignUpScreen
 import com.example.idioms.ui.viewmodels.WordsViewModel
 
 @Composable
-fun NavigationWrapper(wordsViewModel: WordsViewModel) {
+fun NavigationWrapper(
+    wordsViewModel: WordsViewModel,
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit
+) {
 
     val navController = rememberNavController()
 
@@ -36,7 +40,9 @@ fun NavigationWrapper(wordsViewModel: WordsViewModel) {
                 wordsViewModel,
                 navToGame = { navController.navigate(Game) },
                 navToEditWord = { navController.navigate(EditWord) },
-                navToAddWord = { navController.navigate(AddWord) }
+                navToAddWord = { navController.navigate(AddWord) },
+                isDarkTheme = isDarkTheme,
+                onToggleTheme = onToggleTheme
             )
         }
 
