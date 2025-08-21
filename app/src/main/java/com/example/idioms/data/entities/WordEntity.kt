@@ -1,9 +1,13 @@
-package com.example.idioms.ui.models
+package com.example.idioms.data.entities
 
-import com.example.idioms.data.entities.WordEntity
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.idioms.ui.models.Word
 
-data class Word(
-    val id: Int = System.currentTimeMillis().hashCode(),
+@Entity
+data class WordEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
     val date: String,
     val word: String,
     val translation: String,
@@ -16,8 +20,8 @@ data class Word(
     val keyWordC: String,
     val category: String,
 ){
-    fun toEntity(): WordEntity {
-        return WordEntity(
+    fun toModel(): Word {
+        return Word(
             id = this.id,
             date = this.date,
             word = this.word,
@@ -29,7 +33,8 @@ data class Word(
             keyWordA = this.keyWordA,
             keyWordB = this.keyWordB,
             keyWordC = this.keyWordC,
-            category = this.category
+            category = this.category,
+
         )
     }
 }

@@ -17,12 +17,19 @@ import com.example.idioms.R
 import com.example.idioms.ui.components.MyDropdown
 import com.example.idioms.ui.models.Word
 import com.example.idioms.utils.GameState
-import com.example.idioms.utils.words
+import com.example.idioms.utils.categoriesFilter
+import com.example.idioms.utils.gameList
+import com.example.idioms.utils.languagesFilter
+import com.example.idioms.utils.orderList
+import kotlin.math.min
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreen(navBack:() -> Unit) {
+fun GameScreen(
+    navBack:() -> Unit,
+    gameViewModel: GameViewModel
+) {
     var gameState by remember { mutableStateOf(GameState.STOPPED) }
     var correctWords by remember { mutableStateOf(0) }
 
@@ -31,6 +38,8 @@ fun GameScreen(navBack:() -> Unit) {
     var word by remember { mutableStateOf("") }
     var translation by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
+    var index by remember { mutableStateOf(0) }
+
     var category by remember { mutableStateOf("Todas") }
     var originalLang by remember { mutableStateOf("Todos") }
     var translatedLang by remember { mutableStateOf("Todos") }
@@ -43,38 +52,55 @@ fun GameScreen(navBack:() -> Unit) {
     val defaultTextColor = MaterialTheme.colorScheme.onBackground
     var textColor by remember { mutableStateOf(defaultTextColor) }
 
-    var index by remember { mutableStateOf(0) }
-    var wordsList = listOf<Word>()
+    var wordsList by remember { mutableStateOf<List<Word>>(emptyList()) }
 
-    val originList = listOf("Todos") + words.map { it.originalLang }.distinct()
-    val tradList = listOf("Todos") + words.map { it.translatedLang }.distinct()
-    val categoryList = listOf("Todas") + words.map { it.category }.distinct()
-
-    val orderList = listOf("Mas Nuevas","Mas Antiguas","Fecha Random", "Alfabético", "Alfabético Inverso", )
-    val gameList = listOf("Recordar traducción", "Recordar palabra")
+    //val originList = listOf("Todos") + words.map { it.originalLang }.distinct()
+    //val tradList = listOf("Todos") + words.map { it.translatedLang }.distinct()
+    //val categoryList = listOf("Todas") + words.map { it.category }.distinct()
 
 
-    var filteredWords = remember(originalLang, translatedLang, category, order) {
-        words.filter {
-            (originalLang.isEmpty() || originalLang == "Todos" || it.originalLang == originalLang) &&
-                    (translatedLang.isEmpty() || translatedLang == "Todos" || it.translatedLang == translatedLang) &&
-                    (category.isEmpty() || category == "Todas" || it.category == category)
-        }.let { filteredList ->
-            when (order) {
-                "Mas Nuevas" -> filteredList.sortedByDescending { it.date }
-                "Mas Antiguas" -> filteredList.sortedBy { it.date }
-                "Fecha Random" -> filteredList.shuffled()
-                "Alfabético" -> filteredList.sortedBy { it.word }
-                "Alfabético Inverso" -> filteredList.sortedByDescending { it.word }
-                else -> filteredList
+
+
+//    var filteredWords = remember(originalLang, translatedLang, category, order) {
+//        words.filter {
+//            (originalLang.isEmpty() || originalLang == "Todos" || it.originalLang == originalLang) &&
+//                    (translatedLang.isEmpty() || translatedLang == "Todos" || it.translatedLang == translatedLang) &&
+//                    (category.isEmpty() || category == "Todas" || it.category == category)
+//        }.let { filteredList ->
+//            when (order) {
+//                "Mas Nuevas" -> filteredList.sortedByDescending { it.date }
+//                "Mas Antiguas" -> filteredList.sortedBy { it.date }
+//                "Fecha Random" -> filteredList.shuffled()
+//                "Alfabético" -> filteredList.sortedBy { it.word }
+//                "Alfabético Inverso" -> filteredList.sortedByDescending { it.word }
+//                else -> filteredList
+//            }
+//        }
+//    }
+
+//    val amountList = remember(filteredWords) {
+//        amount = 0.toString()
+//        (1..filteredWords.size).map { it.toString() }
+//    }
+    val filteredWords by gameViewModel.filteredWords.collectAsState()
+
+    // mantener 'amount' en rango válido cuando cambian los filtros
+    LaunchedEffect(filteredWords) {
+        if (filteredWords.isEmpty()) {
+            amount = ""
+        } else {
+            val max = filteredWords.size
+            val current = amount.toIntOrNull()
+            amount = when {
+                current == null -> min(10, max).toString() // default
+                current < 1 -> "1"
+                current > max -> max.toString()
+                else -> current.toString()
             }
         }
     }
 
-    val amountList = remember(filteredWords) {
-        amount = 0.toString()
-        (1..filteredWords.size).map { it.toString() }
-    }
+    val amountList = remember(filteredWords) { (1..filteredWords.size).map { it.toString() } }
 
     Scaffold(
         topBar = {
@@ -99,7 +125,8 @@ fun GameScreen(navBack:() -> Unit) {
             )
         },
 
-        content = { paddingValues ->
+
+    ){ paddingValues ->
 
             Column(
                 modifier = Modifier
@@ -115,25 +142,25 @@ fun GameScreen(navBack:() -> Unit) {
 
                         MyDropdown(
                             label = stringResource(R.string.original_language),
-                            options = originList,
+                            options = languagesFilter,
                             selectedOption = originalLang,
-                            onOptionSelected = { originalLang = it },
+                            onOptionSelected = { gameViewModel.setOriginLang(it)/*originalLang = it*/ },
                             modifier = Modifier.weight(1f)
                         )
 
                         MyDropdown(
                             label = stringResource(R.string.translated_language),
-                            options = tradList,
+                            options = languagesFilter,
                             selectedOption = translatedLang,
-                            onOptionSelected = { translatedLang = it },
+                            onOptionSelected = { gameViewModel.setTranslatedLang(it)/*translatedLang = it*/ },
                             modifier = Modifier.weight(1f)
                         )
 
                         MyDropdown(
                             label = stringResource(R.string.categories),
-                            options = categoryList,
+                            options = categoriesFilter,
                             selectedOption = category,
-                            onOptionSelected = { category = it },
+                            onOptionSelected = { gameViewModel.setCategory(it)/*category = it)*/ },
                             modifier = Modifier.weight(1f)
                         )
 
@@ -141,7 +168,10 @@ fun GameScreen(navBack:() -> Unit) {
                             label = stringResource(R.string.order),
                             options = orderList,
                             selectedOption = order,
-                            onOptionSelected = { order = it },
+                            onOptionSelected = {
+                                order = it
+                                gameViewModel.setOrder(it)
+                            },
                             modifier = Modifier.weight(1f)
                         )
 
@@ -176,12 +206,14 @@ fun GameScreen(navBack:() -> Unit) {
 
                         Button(
                             modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-                                    wordsList = filteredWords
-                                    filteredWords = filteredWords.take(amount.toInt())
-                                    gameState = GameState.RUNNING
-                                          },
-                                enabled = filteredWords.isNotEmpty() && amount > 0.toString()
+                            onClick = {
+                                wordsList = filteredWords.take(amount.toIntOrNull() ?: filteredWords.size)
+                                index = 0
+                                correctWords = 0
+                                gameState = GameState.RUNNING
+                            },
+                            enabled = filteredWords.isNotEmpty()
+                            //enabled = filteredWords.isNotEmpty() && amount > 0.toString()
                         ) {
                             Text(
                                 text = stringResource(R.string.play),
@@ -240,7 +272,7 @@ fun GameScreen(navBack:() -> Unit) {
                                 onClick = {
                                     if(game == "Recordar traducción"){
                                         if(translation.replace(" ", "")
-                                            .uppercase() == filteredWords[index].translation
+                                                .uppercase() == filteredWords[index].translation
                                                 .replace(" ", "").uppercase()){
                                             correctWords++
                                             isCorrect = true
@@ -252,7 +284,7 @@ fun GameScreen(navBack:() -> Unit) {
                                         }
                                     }else if(game == "Recordar palabra"){
                                         if(word.replace(" ", "")
-                                            .uppercase() == filteredWords[index].word
+                                                .uppercase() == filteredWords[index].word
                                                 .replace(" ", "").uppercase()){
                                             correctWords++
                                             isCorrect = true
@@ -323,8 +355,15 @@ fun GameScreen(navBack:() -> Unit) {
                         Spacer(Modifier.height(dimensionResource(R.dimen.common_padding_default)))
 
                         Button(onClick = {
-                            filteredWords = wordsList
+                            // NO tocar filteredWords; solo reseteo de la UI
+                            wordsList = emptyList()
                             correctWords = 0
+                            word = ""
+                            translation = ""
+                            isCorrect = null
+                            textColor = defaultTextColor
+                            isCheckEnabled = true
+                            isNextEnabled = false
                             gameState = GameState.STOPPED
                         }) {
                             Text(stringResource(R.string.again))
@@ -335,8 +374,7 @@ fun GameScreen(navBack:() -> Unit) {
 
 
             }
-        }
-    )
+    }
 }
 
 fun getText(juego: String, index: Int, size: Int, palabra: String, traduccion: String): String {

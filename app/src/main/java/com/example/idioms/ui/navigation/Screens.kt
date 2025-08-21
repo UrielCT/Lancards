@@ -12,13 +12,12 @@ object SignUp
 object Home
 
 @Serializable
-object Tutorial
-
-@Serializable
 object Game
 
 @Serializable
-object EditWord
+data class EditWord(
+    val wordId: Int?
+)
 
 @Serializable
 object AddWord

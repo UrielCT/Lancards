@@ -86,6 +86,11 @@ dependencies {
 
 
 
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler) // Para generación de código con kapt
+
 
 
 }

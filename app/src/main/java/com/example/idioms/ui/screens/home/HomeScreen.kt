@@ -1,6 +1,5 @@
 package com.example.idioms.ui.screens.home
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,8 +20,8 @@ import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.School
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,49 +33,50 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.idioms.R
 import com.example.idioms.ui.components.MyDropdown
 import com.example.idioms.ui.components.TutorialDialog
 import com.example.idioms.ui.models.Word
-import com.example.idioms.ui.viewmodels.WordsViewModel
-import com.example.idioms.utils.words
+import com.example.idioms.utils.categoriesFilter
+import com.example.idioms.utils.languagesFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    wordsViewModel: WordsViewModel,
+    homeViewModel: HomeViewModel,
     navToGame: () -> Unit,
-    navToEditWord: () -> Unit,
+    navToEditWord: (Int) -> Unit,
     navToAddWord: () -> Unit,
     isDarkTheme: Boolean,
     onToggleTheme: () -> Unit
 ) {
 
+    val filteredWords by homeViewModel.filteredWords.collectAsState()
+    val searchQuery by homeViewModel.searchQuery.collectAsState()
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showFilters by remember { mutableStateOf(false) }
 
-    val clases = listOf("Clase 1", "Clase 2", "Clase 3")
-    val idiomas = listOf("Español", "Inglés", "Francés")
-    var claseSeleccionada by remember { mutableStateOf(clases[0]) }
-    var idiomaOrigen by remember { mutableStateOf(idiomas[0]) }
-    var idiomaDestino by remember { mutableStateOf(idiomas[1]) }
+    var claseSeleccionada by remember { mutableStateOf(categoriesFilter[0]) }
+    var idiomaOrigen by remember { mutableStateOf(languagesFilter[0]) }
+    var idiomaDestino by remember { mutableStateOf(languagesFilter[0]) }
 
     var input by remember { mutableStateOf("") }
-    val wordsAmount by remember { mutableIntStateOf(1000) }
     var hasFocus by remember { mutableStateOf(false) }
     var selectedWord by remember { mutableStateOf<Word?>(null) }
     var showTutorial by remember { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
-
     val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+
+    var pendingOpenSheet by remember { mutableStateOf(false) }
 
     // Si el teclado no está visible, quita el foco
     LaunchedEffect(imeVisible) {
-        if (!imeVisible) {
-            focusManager.clearFocus()
+        if (!imeVisible && pendingOpenSheet) {
+            showFilters= true
+            pendingOpenSheet= false
         }
     }
 
@@ -109,8 +109,8 @@ fun HomeScreen(
                                 .onFocusChanged { focusState ->
                                     hasFocus = focusState.isFocused
                                 },
-                            value = input,
-                            onValueChange = { input = it },
+                            value = searchQuery/*input*/,
+                            onValueChange = { homeViewModel.onSearchQueryChanged(it)/*input = it*/ },
                             placeholder = { Text(stringResource(R.string.txt_search)) },
                             leadingIcon = {
                                 IconButton(onClick = {
@@ -147,7 +147,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.common_padding_min)))
                         Text(
-                            text = "$wordsAmount",
+                            text = "${filteredWords.size}",
                             fontSize = dimensionResource(R.dimen.text_size_medium_plus).value.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -155,12 +155,22 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showFilters = true }) {
+                    IconButton(onClick = {
+                        if (imeVisible) {
+                            // Si el teclado está abierto → cerrarlo y marcar que queremos abrir sheet
+                            focusManager.clearFocus()
+                            pendingOpenSheet = true
+                        } else {
+                            // Si ya está cerrado → abrir directamente
+                            showFilters = true
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
                             contentDescription = "Filter"
                         )
                     }
+
                 }
             )
         },
@@ -213,7 +223,7 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(horizontal = dimensionResource(R.dimen.common_padding_default))
         ) {
-            items(words) { word ->
+            items(filteredWords) { word ->
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_min)))
                 WordCard(
                     word = word,
@@ -221,6 +231,21 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_min)))
             }
         }
+
+//        when (filteredWords) {
+//            is WordsUiState.Error -> Text("Error al cargar rutinas")
+//            WordsUiState.Loading -> CircularProgressIndicator(
+//                //modifier = Modifier.align(Alignment.CenterHorizontally)
+//            )
+//
+//            is WordsUiState.Success -> {
+//
+//
+//
+//
+//            }
+//        }
+
 
         selectedWord?.let { word ->
             AlertDialog(
@@ -235,8 +260,8 @@ fun HomeScreen(
                 },
                 confirmButton = {
                     Button(onClick = {
+                        selectedWord?.let { word -> navToEditWord(word.id) }
                         selectedWord = null
-                        navToEditWord()
                     }) {
                         Text(stringResource(R.string.txt_edit))
                     }
@@ -244,6 +269,7 @@ fun HomeScreen(
                 dismissButton = {
                     OutlinedButton(
                         onClick = {
+                            selectedWord?.let{ homeViewModel.onWordRemove(word) }
                             selectedWord = null
                         }
                     ) {
@@ -259,9 +285,6 @@ fun HomeScreen(
 
 
         if (showFilters) {
-
-
-
             ModalBottomSheet(
                 sheetState = sheetState,
                 onDismissRequest = { showFilters = false }
@@ -275,9 +298,12 @@ fun HomeScreen(
 
                     MyDropdown(
                         label = stringResource(R.string.categories),
-                        options = clases,
+                        options = categoriesFilter,
                         selectedOption = claseSeleccionada,
-                        onOptionSelected = { claseSeleccionada = it },
+                        onOptionSelected = {
+                            claseSeleccionada = it
+                            homeViewModel.onCategorySelected(it)
+                        },
                         modifier = Modifier.padding(
                             horizontal = dimensionResource(R.dimen.common_padding_default),
                             vertical = dimensionResource(R.dimen.common_padding_min))
@@ -285,18 +311,24 @@ fun HomeScreen(
 
                     MyDropdown(
                         label = stringResource(R.string.original_language),
-                        options = idiomas,
+                        options = languagesFilter,
                         selectedOption = idiomaOrigen,
-                        onOptionSelected = { idiomaOrigen = it },
+                        onOptionSelected = {
+                            idiomaOrigen = it
+                            homeViewModel.onOriginLangSelected(it)
+                        },
                         modifier = Modifier.padding(
                             horizontal = dimensionResource(R.dimen.common_padding_default),
                             vertical = dimensionResource(R.dimen.common_padding_min))
                     )
                     MyDropdown(
                         label = stringResource(R.string.translated_language),
-                        options = idiomas,
+                        options = languagesFilter,
                         selectedOption = idiomaDestino,
-                        onOptionSelected = { idiomaDestino = it },
+                        onOptionSelected = {
+                            idiomaDestino = it
+                            homeViewModel.onDestLangSelected(it)
+                        },
                         modifier = Modifier.padding(
                             horizontal = dimensionResource(R.dimen.common_padding_default),
                             vertical = dimensionResource(R.dimen.common_padding_min))
@@ -305,9 +337,7 @@ fun HomeScreen(
             }
         }
 
-
     }
-
 
 }
 
@@ -361,12 +391,12 @@ private fun WordCard(
     }
 }
 
-
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    val vm: WordsViewModel = WordsViewModel()
-
-    HomeScreen(wordsViewModel = vm, {}, {}, {},true,{})
-}
+//
+//@SuppressLint("ViewModelConstructorInComposable")
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeScreenPreview() {
+//    val vm: WordsViewModel = WordsViewModel()
+//
+//    HomeScreen(wordsViewModel = vm, {}, {}, {},true,{})
+//}

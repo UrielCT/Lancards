@@ -4,16 +4,21 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.idioms.ui.screens.addword.AddWordScreen
 import com.example.idioms.ui.screens.game.GameScreen
 import com.example.idioms.ui.screens.home.HomeScreen
 import com.example.idioms.ui.screens.signin.SignInScreen
 import com.example.idioms.ui.screens.signup.SignUpScreen
-import com.example.idioms.ui.viewmodels.WordsViewModel
+import com.example.idioms.ui.screens.addword.WordsViewModel
+import com.example.idioms.ui.screens.game.GameViewModel
+import com.example.idioms.ui.screens.home.HomeViewModel
 
 @Composable
 fun NavigationWrapper(
     wordsViewModel: WordsViewModel,
+    homeViewModel: HomeViewModel,
+    gameViewModel: GameViewModel,
     isDarkTheme: Boolean,
     onToggleTheme: () -> Unit
 ) {
@@ -37,9 +42,9 @@ fun NavigationWrapper(
 
         composable<Home> {
             HomeScreen(
-                wordsViewModel,
+                homeViewModel = homeViewModel,
                 navToGame = { navController.navigate(Game) },
-                navToEditWord = { navController.navigate(EditWord) },
+                navToEditWord = { wordId -> navController.navigate(EditWord(wordId)) },
                 navToAddWord = { navController.navigate(AddWord) },
                 isDarkTheme = isDarkTheme,
                 onToggleTheme = onToggleTheme
@@ -49,16 +54,25 @@ fun NavigationWrapper(
 
         composable<Game>{
             GameScreen(
+                gameViewModel = gameViewModel,
                 navBack = { navController.popBackStack() }
             )
         }
 
-        composable<EditWord>{
-            AddWordScreen( {navController.popBackStack() } )
+        composable<EditWord>{ backStackEntry ->
+            val args = backStackEntry.toRoute<EditWord>()
+            AddWordScreen(
+                wordsViewModel=wordsViewModel,
+                navBack = { navController.popBackStack() },
+                wordId = args.wordId
+            )
         }
 
         composable<AddWord>{
-            AddWordScreen( {navController.popBackStack() } )
+            AddWordScreen(
+                wordsViewModel=wordsViewModel,
+                navBack = { navController.popBackStack() }
+            )
         }
     }
 
