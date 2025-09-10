@@ -1,4 +1,4 @@
-package com.example.idioms.data.dao
+package com.example.idioms.data.datastore.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete

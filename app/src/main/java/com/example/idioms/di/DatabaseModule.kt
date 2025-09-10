@@ -1,9 +1,9 @@
-package com.example.idioms.data.di
+package com.example.idioms.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.idioms.data.IdiomsDatabase
-import com.example.idioms.data.dao.WordDao
+import com.example.idioms.data.datastore.local.IdiomsDatabase
+import com.example.idioms.data.datastore.local.dao.WordDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +17,7 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext appContext: Context): IdiomsDatabase{
+    fun provideDatabase(@ApplicationContext appContext: Context): IdiomsDatabase {
         return Room.databaseBuilder(appContext, IdiomsDatabase::class.java, "IdiomsDatabase").build()
     }
 

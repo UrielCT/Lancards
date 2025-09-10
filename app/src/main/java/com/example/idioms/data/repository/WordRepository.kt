@@ -1,6 +1,6 @@
 package com.example.idioms.data.repository
 
-import com.example.idioms.data.dao.WordDao
+import com.example.idioms.data.datastore.local.dao.WordDao
 import com.example.idioms.ui.models.Word
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class WordRepository @Inject constructor( private val wordDao: WordDao ) {
+class WordRepository @Inject constructor( private val wordDao: WordDao) {
 
     // get all Words
     val words: Flow<List<Word>> = wordDao.getWords()
