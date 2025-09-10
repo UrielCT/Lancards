@@ -13,7 +13,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.idioms"
+        applicationId = "com.lancards"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
