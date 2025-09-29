@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.example.idioms.data.datastore.local.IdiomsDatabase
 import com.example.idioms.data.datastore.local.dao.WordDao
+import com.example.idioms.data.repository.WordRepositoryImpl
+import com.example.idioms.domain.repository.WordRepository
+import com.example.idioms.utils.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +21,7 @@ class DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext appContext: Context): IdiomsDatabase {
-        return Room.databaseBuilder(appContext, IdiomsDatabase::class.java, "IdiomsDatabase").build()
+        return Room.databaseBuilder(appContext, IdiomsDatabase::class.java, Constants.DB_NAME).build()
     }
 
 
@@ -27,5 +30,10 @@ class DatabaseModule {
         return idiomsDatabase.wordDao()
     }
 
+    @Provides
+    @Singleton
+    fun provideWordRepository(wordDao: WordDao): WordRepository {
+        return WordRepositoryImpl(wordDao)
+    }
 
 }

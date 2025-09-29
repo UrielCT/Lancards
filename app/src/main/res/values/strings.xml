@@ -35,17 +35,33 @@
     <string name="game">Game</string>
     <string name="amount">Amount</string>
     <string name="add_word">Add Word</string>
+    <string name="edit_word">Edit Word</string>
     <string name="categories">Category</string>
-    <string name="original_language">Original Language</string>
-    <string name="translated_language">Translated Language</string>
+    <string name="original_language">Original</string>
+    <string name="translated_language">Translated</string>
     <string name="words_game">Words Game</string>
     <string name="play">Play</string>
     <string name="filtered_words">Filtered words: %1$s</string>
     <string name="check">Check</string>
     <string name="next">Next</string>
     <string name="correct_words_text">Correct: %1$s of %2$s</string>
+    <string name="error_words_text">Error: %1$s</string>
     <string name="order_text">Order: %1$s</string>
     <string name="game_text">Game: %1$s</string>
     <string name="again">Again</string>
+    <string name="msg_empty"> </string>
+    <string name="weather_general_error">Error desconocido</string>
+    <string name="weather_search_error">Id no encontrado</string>
+    <string name="supporting_required">Texto requerido</string>
+    <string name="word_deleted">Word deleted</string>
+    <string name="word_added">Word added</string>
+    <string name="word_updated">Word updated</string>
+    <string name="tf_correct_word">Ingrese la forma correcta</string>
+    <string name="fab_add_word">Agregar palabra</string>
+    <string name="error_word">Error al cargar la palabra</string>
+    <string name="btn_save">Guardar</string>
+    <string name="title_filters">Filtros</string>
+    <string name="title_languages">Languages</string>
+    <string name="unfound_words">Palabras no encontradas</string>
 
 </resources>

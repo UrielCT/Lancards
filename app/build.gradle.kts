@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -64,20 +65,34 @@ dependencies {
     // hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-    
 
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+    // Hilt Compose
+    implementation ("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+    // Hilt core
+    implementation ("com.google.dagger:hilt-android:2.48")
+    kapt ("com.google.dagger:hilt-android-compiler:2.48")
+
+
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
+
+
+    implementation ("androidx.core:core-splashscreen:1.0.1")
+
+
+
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 
     // DataStore Preferences
-    implementation ("androidx.datastore:datastore-preferences:1.1.0")
+    implementation (libs.androidx.datastore.preferences)
 
     // Coroutines (si no las tenés)
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation (libs.kotlinx.coroutines.core)
+    implementation (libs.kotlinx.coroutines.android)
 
 
     // Añadir la dependencia de material-icons-extended
-    implementation("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.runtime.android)
 
@@ -89,6 +104,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    //noinspection KaptUsageInsteadOfKsp
     kapt(libs.androidx.room.compiler) // Para generación de código con kapt
 
 

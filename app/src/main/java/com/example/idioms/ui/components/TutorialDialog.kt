@@ -1,26 +1,43 @@
 package com.example.idioms.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.idioms.R
+import com.example.idioms.ui.theme.AlertDialogWidthInMax
+import com.example.idioms.ui.theme.CommonFontSizeDefault
+import com.example.idioms.ui.theme.CommonFontSizeDefaultMid
+import com.example.idioms.ui.theme.CommonFontSizeLarge
+import com.example.idioms.ui.theme.CommonFontSizeMiddle
+import com.example.idioms.ui.theme.CommonFontSizeMiddleMin
+import com.example.idioms.ui.theme.CommonFontSizeMin
+import com.example.idioms.ui.theme.CommonPaddingDefault
+import com.example.idioms.ui.theme.CommonPaddingMiddle
+import com.example.idioms.ui.theme.CommonPaddingMin
+import com.example.idioms.ui.theme.MediumScreenWidth
+import com.example.idioms.ui.theme.SmallScreenWidth
+import com.example.idioms.utils.descriptionExample
 
 @Composable
 fun TutorialDialog( onExit:() -> Unit) {
 
     AlertDialog(
-        modifier = Modifier.fillMaxWidth(),
-
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = CommonPaddingDefault, vertical = CommonPaddingMiddle)
+            .widthIn(max = AlertDialogWidthInMax),
         onDismissRequest = { onExit() },
         title = {
             Box(
@@ -28,6 +45,7 @@ fun TutorialDialog( onExit:() -> Unit) {
             ) {
                 Text(
                     stringResource(R.string.title_tutorial),
+                    style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -42,46 +60,57 @@ fun TutorialDialog( onExit:() -> Unit) {
         },
         text = {
 
-            Column(modifier = Modifier) {
-                Text(
-                    text = stringResource(R.string.title_description),
-                    fontSize = dimensionResource(R.dimen.text_size_medium_plus).value.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = stringResource(R.string.txt_description))
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_min)))
+            BoxWithConstraints {
+                val screenWidth = maxWidth
+                val titleSize = when {
+                    screenWidth < SmallScreenWidth -> CommonFontSizeMiddle
+                    screenWidth < MediumScreenWidth -> CommonFontSizeDefault
+                    else -> CommonFontSizeLarge
+                }
+                val bodySize = when {
+                    screenWidth < SmallScreenWidth -> CommonFontSizeMin
+                    screenWidth < MediumScreenWidth -> CommonFontSizeMiddleMin
+                    else -> CommonFontSizeDefaultMid
+                }
 
-                Text(
-                    text = stringResource(R.string.title_steps),
-                    fontSize = dimensionResource(R.dimen.text_size_medium_plus).value.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = stringResource(R.string.txt_steps))
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.common_padding_min)))
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = stringResource(R.string.title_description),
+                        fontSize = titleSize,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = stringResource(R.string.txt_description),
+                        fontSize = bodySize
+                    )
+                    Spacer(modifier = Modifier.height(CommonPaddingMin))
 
-                Text(
-                    text = stringResource(R.string.title_example),
-                    fontSize = dimensionResource(R.dimen.text_size_medium_plus).value.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Palabra en inglés: \"Carrot\" (zanahoria). Asociación inverosímil: " +
-                            "Imagina a un \"carro\" con ruedas de zanahoria. Imagen mental: Un auto deportivo con zanahorias gigantes en lugar de llantas."
-                )
+                    Text(
+                        text = stringResource(R.string.title_steps),
+                        fontSize = titleSize,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = stringResource(R.string.txt_steps),
+                        fontSize = bodySize
+                    )
+                    Spacer(modifier = Modifier.height(CommonPaddingMin))
+
+                    Text(
+                        text = stringResource(R.string.title_example),
+                        fontSize = titleSize,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = descriptionExample,
+                        fontSize = bodySize
+                    )
+                }
             }
 
         },
         confirmButton = {}
     )
-
-}
-
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun TutorialDialogPreview() {
-    TutorialDialog({})
 }

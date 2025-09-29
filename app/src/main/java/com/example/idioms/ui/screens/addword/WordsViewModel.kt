@@ -2,14 +2,16 @@ package com.example.idioms.ui.screens.addword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.idioms.R
 import com.example.idioms.domain.usecases.words.AddWordUseCase
 import com.example.idioms.domain.usecases.words.GetWordByIdUseCase
 import com.example.idioms.domain.usecases.words.UpdateWordUseCase
-import com.example.idioms.ui.models.Word
+import com.example.idioms.domain.models.Word
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,30 +22,34 @@ class WordsViewModel @Inject constructor(
     private val updateWordUseCase: UpdateWordUseCase,
 ):ViewModel() {
 
-    // get word by id
-    private val _selectedWordState = MutableStateFlow<WordUiState>(WordUiState.Loading)
-    val selectedWordState: StateFlow<WordUiState> = _selectedWordState
+    private val _selectedWordState = MutableStateFlow<WordUiState>(WordUiState.Idle)
+    val selectedWordState: StateFlow<WordUiState> = _selectedWordState.asStateFlow()
 
-    // Resetear estado a null (útil cuando creamos nueva palabra)
     fun resetSelectedWord() {
-        _selectedWordState.value = WordUiState.Success(null)
+        _selectedWordState.value = WordUiState.Idle
     }
 
-    // Obtener palabra por ID
-    fun onGetWordById(id: Int) {
-        _selectedWordState.value = WordUiState.Loading //  inicio en Loading para evitar mostrar la anterior
-        viewModelScope.launch {
-            getWordByIdUseCase(id)
-                .catch { _selectedWordState.value = WordUiState.Error(it) }
-                .collect { word ->
-                    _selectedWordState.value = WordUiState.Success(word)
+    fun getWordById(id: Int) {
+        _selectedWordState.value = WordUiState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = getWordByIdUseCase(id)
+                if (result != null) {
+                    _selectedWordState.value = WordUiState.Success(result)
+                } else {
+                    _selectedWordState.value = WordUiState.Error(R.string.weather_search_error)
                 }
+            } catch (e: Exception) {
+                _selectedWordState.value = WordUiState.Error(R.string.weather_general_error)
+            }
         }
     }
 
+    fun onWordCreated(word: Word) = viewModelScope.launch (Dispatchers.IO) {
+        addWordUseCase(word)
+    }
 
-    // CRUD
-    fun onWordCreated(word: Word) = viewModelScope.launch { addWordUseCase(word) }
-    fun onWordUpdated(word: Word) = viewModelScope.launch { updateWordUseCase(word) }
-
+    fun onWordUpdated(word: Word) = viewModelScope.launch (Dispatchers.IO) {
+        updateWordUseCase(word)
+    }
 }

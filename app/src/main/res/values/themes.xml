@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Idioms" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Idioms" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorOnBackground">@color/colorOnBackground</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+        <item name="colorError">@color/colorError</item>
+        <item name="colorOnError">@color/colorOnError</item>
+    </style>
+
+    <!-- Tema de Splash -->
+    <style name="Theme.Splash" parent="Theme.SplashScreen">
+        <!-- Fondo (puede ser tu colorBackground o un color fijo como #000000) -->
+        <item name="windowSplashScreenBackground">@color/colorPrimary</item>
+
+        <!-- Ícono que aparece en el centro -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+
+        <!-- Duración mínima de la animación del ícono -->
+        <item name="windowSplashScreenAnimationDuration">2000</item>
+
+        <!-- Tema que se aplica después del splash -->
+        <item name="postSplashScreenTheme">@style/Theme.Idioms</item>
+    </style>
+
 </resources>
