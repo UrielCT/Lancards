@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 //val PurpleGrey40 = Color(0xFF625b71)
 //val Pink40 = Color(0xFF7D5260)
 
-//val ProgressBackground = Color(0x40A3A3A3)
+val ProgressBackground = Color(0x40A3A3A3)
 
 // --- Light theme ---
 val LightPrimary = Color(0xFF1976D2)
