@@ -24,7 +24,6 @@ class DatabaseModule {
         return Room.databaseBuilder(appContext, IdiomsDatabase::class.java, Constants.DB_NAME).build()
     }
 
-
     @Provides
     fun provideWordDao(idiomsDatabase: IdiomsDatabase): WordDao {
         return idiomsDatabase.wordDao()

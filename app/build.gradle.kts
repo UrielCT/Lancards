@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinSerialization)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.crashlytics)
 }
 
 
@@ -13,7 +15,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.lancards"
+        applicationId = "com.example.idioms"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -65,19 +67,17 @@ dependencies {
     // hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-
     // Hilt Compose
-    implementation ("androidx.hilt:hilt-navigation-compose:1.1.0")
-
+    implementation (libs.androidx.hilt.navigation.compose)
     // Hilt core
-    implementation ("com.google.dagger:hilt-android:2.48")
-    kapt ("com.google.dagger:hilt-android-compiler:2.48")
+    implementation (libs.hilt.android)
+    kapt (libs.hilt.android.compiler)
 
 
-    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
+    implementation (libs.accompanist.systemuicontroller)
 
 
-    implementation ("androidx.core:core-splashscreen:1.0.1")
+    implementation (libs.androidx.core.splashscreen)
 
 
 
@@ -86,12 +86,11 @@ dependencies {
     // DataStore Preferences
     implementation (libs.androidx.datastore.preferences)
 
-    // Coroutines (si no las tenés)
+    // Coroutines
     implementation (libs.kotlinx.coroutines.core)
     implementation (libs.kotlinx.coroutines.android)
 
-
-    // Añadir la dependencia de material-icons-extended
+    // material-icons-extended
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.runtime.android)
@@ -99,14 +98,14 @@ dependencies {
     implementation (libs.androidx.navigation.compose)
     implementation (libs.kotlinx.serialization.json)
 
-
+    // firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
 
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     //noinspection KaptUsageInsteadOfKsp
-    kapt(libs.androidx.room.compiler) // Para generación de código con kapt
-
-
+    kapt(libs.androidx.room.compiler)
 
 }
